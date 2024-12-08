@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('getcode'){
             steps {
-                git 'https://github.com/julianxttecn05/helloworld.git'
+                git 'https://github.com/julianxttecn05/CP1Julian.git'
             }
         }
         
