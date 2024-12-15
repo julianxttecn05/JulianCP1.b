@@ -3,12 +3,16 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                echo 'Identificando el agente...'
+                bat 'whoami && hostname'
                 echo 'Clonando el repositorio...'
                 git url: 'https://github.com/julianxttecn05/CP1Julian.git', branch: 'master'
             }
         }
         stage('Build') {
             steps {
+                echo 'Identificando el agente...'
+                bat 'whoami && hostname'
                 echo 'No hay que compilar nada, esto es Python'
                 dir('.') {
                     bat 'dir'
@@ -20,6 +24,8 @@ pipeline {
                 stage('Unit Tests') {
                     agent { label 'Agent1' }
                     steps {
+                        echo 'Identificando el agente...'
+                        bat 'whoami && hostname'
                         echo 'Ejecutando pruebas unitarias...'
                         script {
                             if (fileExists('test/unit')) {
@@ -33,6 +39,8 @@ pipeline {
                 stage('Start Flask Server') {
                     agent { label 'Agent2' }
                     steps {
+                        echo 'Identificando el agente...'
+                        bat 'whoami && hostname'
                         echo 'Ejecutando servidor Flask...'
                         bat 'start /B python -m flask run --host=127.0.0.1 --port=5000'
                         sleep(time: 15, unit: 'SECONDS') // Espera para que Flask inicie
@@ -41,6 +49,8 @@ pipeline {
                 stage('Health Check') {
                     agent { label 'Agent2' }
                     steps {
+                        echo 'Identificando el agente...'
+                        bat 'whoami && hostname'
                         echo 'Comprobando el estado de la API...'
                         script {
                             def response = bat(script: 'curl -I http://127.0.0.1:5000', returnStatus: true)
@@ -56,11 +66,12 @@ pipeline {
         }
         stage('Results') {
             steps {
+                echo 'Identificando el agente...'
+                bat 'whoami && hostname'
                 echo 'Todas las etapas completadas con éxito.'
             }
         }
     }
-
     post {
         always {
             echo 'Limpiando el espacio de trabajo...'
