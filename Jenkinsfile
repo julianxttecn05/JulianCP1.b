@@ -6,7 +6,7 @@ pipeline {
                 echo 'Identificando el agente...'
                 bat 'whoami && hostname'
                 echo 'Clonando el repositorio...'
-                git url: 'https://github.com/julianxttecn05/CP1Julian.git', branch: 'master'
+                git url: 'https://github.com/julianxttecn05/CP1Julian.git', branch: 'develop'
             }
         }
         stage('Build') {
