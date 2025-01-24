@@ -1,7 +1,3 @@
-import http.client
-
-from flask import Flask
-
 from app import util
 from app.calc import Calculator
 
@@ -9,11 +5,9 @@ CALCULATOR = Calculator()
 api_application = Flask(__name__)
 HEADERS = {"Content-Type": "text/plain", "Access-Control-Allow-Origin": "*"}
 
-
 @api_application.route("/")
 def hello():
-    return "Hello from The Calculator!\n"
-
+    return "Hello from the Calculator!\n"
 
 @api_application.route("/calc/add/<op_1>/<op_2>", methods=["GET"])
 def add(op_1, op_2):
@@ -23,33 +17,29 @@ def add(op_1, op_2):
     except TypeError as e:
         return (str(e), http.client.BAD_REQUEST, HEADERS)
 
-
-@api_application.route("/calc/substract/<op_1>/<op_2>", methods=["GET"])
-def substract(op_1, op_2):
+@api_application.route("/calc/subtract/<op_1>/<op_2>", methods=["GET"])
+def subtract(op_1, op_2):
     try:
         num_1, num_2 = util.convert_to_number(op_1), util.convert_to_number(op_2)
-        return ("{}".format(CALCULATOR.substract(num_1, num_2)), http.client.OK, HEADERS)
+        return ("{}".format(CALCULATOR.subtract(num_1, num_2)), http.client.OK, HEADERS)
     except TypeError as e:
         return (str(e), http.client.BAD_REQUEST, HEADERS)
 
-
 @api_application.route("/calc/multiply/<op_1>/<op_2>", methods=["GET"])
-def add(op_1, op_2):
+def multiply(op_1, op_2):
     try:
         num_1, num_2 = util.convert_to_number(op_1), util.convert_to_number(op_2)
         return ("{}".format(CALCULATOR.multiply(num_1, num_2)), http.client.OK, HEADERS)
     except TypeError as e:
         return (str(e), http.client.BAD_REQUEST, HEADERS)
 
-
 @api_application.route("/calc/divide/<op_1>/<op_2>", methods=["GET"])
-def add(op_1, op_2):
+def divide(op_1, op_2):
     try:
         num_1, num_2 = util.convert_to_number(op_1), util.convert_to_number(op_2)
-
         if num_2 == 0:
-            return ("", 406, HEADERS)
-        else       
+            return ("Division by zero is not allowed", http.client.NOT_ACCEPTABLE, HEADERS)  # Cambia a 406 Not Acceptable
+        else:
             return ("{}".format(CALCULATOR.divide(num_1, num_2)), http.client.OK, HEADERS)
     except TypeError as e:
         return (str(e), http.client.BAD_REQUEST, HEADERS)

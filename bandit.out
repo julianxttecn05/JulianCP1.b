@@ -1,0 +1,4 @@
+C:\Users\julia\Documents\GitHub\JulianCP1.1\test\rest\api_test.py:20: [B310] Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.
+C:\Users\julia\Documents\GitHub\JulianCP1.1\test\rest\api_test.py:38: [B310] Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.
+C:\Users\julia\Documents\GitHub\JulianCP1.1\test\rest\api_test.py:55: [B310] Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.
+C:\Users\julia\Documents\GitHub\JulianCP1.1\test\rest\api_test.py:64: [B310] Audit url open for permitted schemes. Allowing use of file:/ or custom schemes is often unexpected.
