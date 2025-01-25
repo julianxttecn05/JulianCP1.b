@@ -11,7 +11,7 @@ pipeline {
         }
         stage('Unit') {
             steps {
-                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                     bat '''
                     set PYTHONPATH=.
                     pytest --junitxml=result-unit.xml test\\unit
@@ -21,6 +21,22 @@ pipeline {
             }
         }
 
+
+        stage('Coverage') {
+            steps {
+                bat '''
+                coverage run --branch --source=app --omit=app\\__init__.py,app\\api.py -m pytest test\\unit
+                coverage xml
+                '''
+                catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                    cobertura coberturaReportFile: 'coverage.xml', 
+                              conditionalCoverageTargets: '100,0,90', 
+                              lineCoverageTargets: '100,0,95',
+                              onlyStable: false
+                }
+            }
+        }
+        
         stage('rest') {
             steps {
                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
@@ -36,21 +52,7 @@ pipeline {
                     '''
                 }
             }
-        }
-        
-        stage('Coverage') {
-            steps {
-                bat '''
-                coverage run --branch --source=app --omit=app\\__init__.py,app\\api.py -m pytest test\\unit
-                coverage xml
-                '''
-                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                    cobertura coberturaReportFile: 'coverage.xml', 
-                              conditionalCoverageTargets: '100,0,90', 
-                              lineCoverageTargets: '100,0,95'
-                }
-            }
-        }
+        }        
 
         stage('Static') {
             steps {
@@ -91,3 +93,4 @@ pipeline {
 
     }
 }
+
