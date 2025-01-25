@@ -1,0 +1,29 @@
+app\api.py:5: [F821] undefined name 'Flask'
+app\api.py:8: [E302] expected 2 blank lines, found 1
+app\api.py:12: [E302] expected 2 blank lines, found 1
+app\api.py:15: [E501] line too long (81 > 79 characters)
+app\api.py:16: [F821] undefined name 'http'
+app\api.py:16: [E501] line too long (83 > 79 characters)
+app\api.py:18: [F821] undefined name 'http'
+app\api.py:20: [E302] expected 2 blank lines, found 1
+app\api.py:23: [E501] line too long (81 > 79 characters)
+app\api.py:24: [F821] undefined name 'http'
+app\api.py:24: [E501] line too long (88 > 79 characters)
+app\api.py:26: [F821] undefined name 'http'
+app\api.py:28: [E302] expected 2 blank lines, found 1
+app\api.py:31: [E501] line too long (81 > 79 characters)
+app\api.py:32: [F821] undefined name 'http'
+app\api.py:32: [E501] line too long (88 > 79 characters)
+app\api.py:34: [F821] undefined name 'http'
+app\api.py:36: [E302] expected 2 blank lines, found 1
+app\api.py:39: [E501] line too long (81 > 79 characters)
+app\api.py:41: [F821] undefined name 'http'
+app\api.py:41: [E501] line too long (122 > 79 characters)
+app\api.py:43: [F821] undefined name 'http'
+app\api.py:43: [E501] line too long (90 > 79 characters)
+app\api.py:45: [F821] undefined name 'http'
+app\calc.py:1: [F401] 'app' imported but unused
+app\calc.py:24: [E271] multiple spaces after keyword
+app\calc.py:24: [E501] line too long (110 > 79 characters)
+app\calc.py:33: [E271] multiple spaces after keyword
+app\calc.py:33: [E501] line too long (125 > 79 characters)
