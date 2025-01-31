@@ -1,0 +1,134 @@
+pipeline {
+    agent none
+    stages {
+        stage('Get Code') {
+            agent { label 'shared-agent' }
+            steps {
+                // Clonar repositorio en la rama específica
+                git branch: 'feature_fix_coverage', url: 'https://github.com/julianxttecn05/JulianCP1.b.git'
+                bat 'whoami'
+                bat 'hostname'
+                echo "Workspace: ${WORKSPACE}"
+                stash includes: '**', name: 'source-code'
+            }
+        }
+
+        stage('Parallel Execution') {
+            parallel {
+                stage('Unit and Coverage') {
+                    agent { label 'test-agent' }
+                    stages {
+                        stage('Unit') {
+                            steps {
+                                unstash 'source-code'
+                                catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                                    bat """
+                                    set PYTHONPATH=.
+                                    pytest --junitxml=result-unit.xml test\\unit
+                                    """
+                                    junit 'result*.xml'
+                                }
+                                bat 'whoami'
+                                bat 'hostname'
+                                echo "Workspace: ${WORKSPACE}"
+                                stash includes: 'result-unit.xml', name: 'unit-results'
+                            }
+                        }
+                        stage('Coverage') {
+                            steps {
+                                unstash 'source-code'
+                                bat """
+                                coverage run --branch --source=app --omit=app\\__init__.py,app\\api.py -m pytest test\\unit
+                                coverage xml
+                                """
+                                catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                                    cobertura coberturaReportFile: 'coverage.xml', 
+                                              conditionalCoverageTargets: '100,0,90', 
+                                              lineCoverageTargets: '100,0,95',
+                                              onlyStable: false
+                                }
+                                bat 'whoami'
+                                bat 'hostname'
+                                echo "Workspace: ${WORKSPACE}"
+                                stash includes: 'coverage.xml', name: 'coverage-report'
+                            }
+                        }
+                    }
+                }
+
+                stage('REST') {
+                    agent { label 'test-agent' }
+                    steps {
+                        unstash 'source-code'
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                            bat """
+                            set FLASK_APP=app\\api.py
+                            start /B flask run
+                            ping -n 10 127.0.0.1 > nul
+                            start java -jar C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\wiremock-standalone-3.10.0.jar --port 9090 --root-dir C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\O24\\pipeline1\\test\\wiremock
+                            ping -n 10 127.0.0.1
+                            python -m pytest --junitxml=result-rest.xml test\\rest
+                            """
+                        }
+                        bat 'whoami'
+                        bat 'hostname'
+                        echo "Workspace: ${WORKSPACE}"
+                        stash includes: 'result-rest.xml', name: 'rest-results'
+                    }
+                }
+
+                stage('Static') {
+                    agent { label 'analysis-agent' }
+                    steps {
+                        unstash 'source-code'
+                        bat """
+                        python -m flake8 --exit-zero --format=pylint app > flake8.out
+                        """
+                        recordIssues tools: [flake8(name: 'Flake8', pattern: 'flake8.out')], 
+                                     qualityGates: [[threshold: 8, type: 'TOTAL', unstable: true], 
+                                                    [threshold: 10, type: 'TOTAL', unstable: false]]
+                        bat 'whoami'
+                        bat 'hostname'
+                        echo "Workspace: ${WORKSPACE}"
+                        stash includes: 'flake8.out', name: 'static-analysis'
+                    }
+                }
+
+                stage('Security') {
+                    agent { label 'security-agent' }
+                    steps {
+                        unstash 'source-code'
+                        bat """
+                        bandit --exit-zero -r . -f custom -o bandit.out --msg-template "{abspath}:{line}: [{test_id}] {msg}"
+                        """
+                        recordIssues tools: [pyLint(name: 'Bandit', pattern: 'bandit.out')], 
+                                     qualityGates: [[threshold: 2, type: 'TOTAL', unstable: true], 
+                                                    [threshold: 4, type: 'TOTAL', unstable: false]]
+                        bat 'whoami'
+                        bat 'hostname'
+                        echo "Workspace: ${WORKSPACE}"
+                        stash includes: 'bandit.out', name: 'security-analysis'
+                    }
+                }
+
+                stage('Performance') {
+                    agent { label 'shared-agent' }
+                    steps {
+                        unstash 'source-code'
+                        bat """
+                        set FLASK_APP=app\\api.py
+                        start /B flask run
+                        ping -n 10 127.0.0.1 > nul
+                        C:\\Users\\julia\\Downloads\\apache-jmeter-5.6.3\\apache-jmeter-5.6.3\\bin\\jmeter -n -t test\\jmeter\\CP1B.jmx -f -l flask.jtl
+                        """
+                        perfReport sourceDataFiles: 'flask.jtl'
+                        bat 'whoami'
+                        bat 'hostname'
+                        echo "Workspace: ${WORKSPACE}"
+                        stash includes: 'flask.jtl', name: 'performance-report'
+                    }
+                }
+            }
+        }
+    }
+}
